@@ -1,0 +1,80 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: '2024-11-01T15:34:17Z'
+  generation: 18
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:results': {}
+          'f:steps': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2024-11-01T16:34:26Z'
+  name: get-meta
+  namespace: cp4i
+  resourceVersion: '204630604'
+  uid: cb6c3652-8bc6-44d4-a310-3d78631136ec
+spec:
+  results:
+    - description: metadata from git repos for appName
+      name: appName
+      type: string
+    - description: metadata from git repos for namespace
+      name: namespace
+      type: string
+    - description: metadata from git repos for request-cpu
+      name: request-cpu
+      type: string
+    - description: metadata from git repos for request-memory
+      name: request-memory
+      type: string
+    - description: metadata from git repos for limit-cpu
+      name: limit-cpu
+      type: string
+    - description: metadata from git repos for limit-memory
+      name: limit-memory
+      type: string
+    - description: metadata from git repos for configurations
+      name: configurations
+      type: string
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: debug
+      resources: {}
+      script: |
+        echo "Hello World!"
+        pwd
+        ls -l /workspace/output
+        cat /workspace/output/meta.data
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: get-appname
+      resources: {}
+      script: >
+        grep appName /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.appName.path)  
+
+        grep namespace /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.namespace.path)  
+
+        grep request-cpu /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.request-cpu.path)  
+
+        grep request-memory /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.request-memory.path)  
+
+        grep limit-cpu /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.limit-cpu.path)  
+
+        grep limit-memory /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.limit-memory.path)  
+
+        grep configurations /workspace/output/meta.data | cut -d'=' -f2  | tee
+        $(results.configurations.path)  
+  workspaces:
+    - description: User workspace
+      name: output
