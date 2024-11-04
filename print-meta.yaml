@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: '2024-11-01T15:40:06Z'
+  generation: 5
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:params': {}
+          'f:steps': {}
+      manager: Mozilla
+      operation: Update
+      time: '2024-11-01T16:47:28Z'
+  name: print-meta
+  namespace: cp4i
+  resourceVersion: '204719792'
+  uid: 384cf0dc-df41-4265-8b8b-a0fcf07f9eeb
+spec:
+  params:
+    - name: appName
+      type: string
+    - name: namespace
+      type: string
+    - name: request-cpu
+      type: string
+    - name: request-memory
+      type: string
+    - name: limit-cpu
+      type: string
+    - name: limit-memory
+      type: string
+    - name: configurations
+      type: string
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: ''
+      resources: {}
+      script: |
+        echo appName: $(inputs.params.appName)
+        echo namespace: $(inputs.params.namespace)
+        echo request-cpu: $(inputs.params.request-cpu)
+        echo request-memory: $(inputs.params.request-memory)
+        echo limit-cpu: $(inputs.params.limit-cpu)
+        echo limit-memory: $(inputs.params.limit-memory)
+        echo configurations: $(inputs.params.configurations)
