@@ -1,0 +1,122 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  creationTimestamp: '2024-11-01T15:23:04Z'
+  generation: 13
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:finally': {}
+          'f:params': {}
+          'f:resources': {}
+          'f:tasks': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2024-11-01T17:14:48Z'
+  name: deploy-ir-pipeline
+  namespace: cp4i
+  resourceVersion: '204883500'
+  uid: 84688a48-dbbf-4307-9ff2-cf01b45ea1bb
+spec:
+  tasks:
+    - name: git-clone-1-14-0
+      params:
+        - name: url
+          value: 'https://github.com/pfaulkn/aceapp'
+        - name: revision
+          value: ''
+        - name: refspec
+          value: ''
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: crtFileName
+          value: ca-bundle.crt
+        - name: subdirectory
+          value: ''
+        - name: sparseCheckoutDirectories
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+        - name: httpProxy
+          value: ''
+        - name: httpsProxy
+          value: ''
+        - name: noProxy
+          value: ''
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:20195b44af8e0b2238148003aacb2b278a9c3468893b3967da45e7ae1c3b2e9b
+        - name: userHome
+          value: /home/git
+      taskRef:
+        kind: ClusterTask
+        name: git-clone-1-14-0
+      workspaces:
+        - name: output
+          workspace: my-pipeline-workspace
+    - name: get-meta
+      params:
+        - name: appName
+          value: test
+      runAfter:
+        - git-clone-1-14-0
+      taskRef:
+        kind: Task
+        name: get-meta
+      workspaces:
+        - name: output
+          workspace: my-pipeline-workspace
+    - name: print-meta
+      params:
+        - name: appName
+          value: $(tasks.get-meta.results.appName)
+        - name: namespace
+          value: $(tasks.get-meta.results.namespace)
+        - name: request-cpu
+          value: $(tasks.get-meta.results.request-cpu)
+        - name: request-memory
+          value: $(tasks.get-meta.results.request-memory)
+        - name: limit-cpu
+          value: $(tasks.get-meta.results.limit-cpu)
+        - name: limit-memory
+          value: $(tasks.get-meta.results.limit-memory)
+        - name: configurations
+          value: $(tasks.get-meta.results.configurations)
+      runAfter:
+        - get-meta
+      taskRef:
+        kind: Task
+        name: print-meta
+    - name: deploy-ir-meta-task
+      params:
+        - name: appName
+          value: $(tasks.get-meta.results.appName)
+        - name: namespace
+          value: $(tasks.get-meta.results.namespace)
+        - name: request-cpu
+          value: $(tasks.get-meta.results.request-cpu)
+        - name: request-memory
+          value: $(tasks.get-meta.results.request-memory)
+        - name: limit-cpu
+          value: $(tasks.get-meta.results.limit-cpu)
+        - name: limit-memory
+          value: $(tasks.get-meta.results.limit-memory)
+        - name: configurations
+          value: $(tasks.get-meta.results.configurations)
+      runAfter:
+        - print-meta
+      taskRef:
+        kind: Task
+        name: deploy-ir-meta-task
+  workspaces:
+    - name: my-pipeline-workspace
